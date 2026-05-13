@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 
 function App() {
   const [jobs, setJobs] = useState([]);
@@ -7,10 +6,9 @@ function App() {
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/jobs")
-      .then((response) => response.json())
-      .then((data) => {
-        setJobs(data);
-      });
+      .then((res) => res.json())
+      .then((data) => setJobs(data))
+      .catch((err) => console.log(err));
   }, []);
 
   const filteredJobs = jobs.filter((job) => {
@@ -18,75 +16,120 @@ function App() {
 
     return (
       job.company.toLowerCase().includes(searchText) ||
-      job.categories.some((category) =>
-        category.toLowerCase().includes(searchText)
-      )
+      job.categories.join(" ").toLowerCase().includes(searchText)
     );
   });
 
   return (
-    <div className="app-container">
-      <nav className="navbar">
-        <h1>DirectHire Local</h1>
-      </nav>
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: "20px",
+        fontFamily: "Arial",
+        backgroundColor: "#f5f5f5",
+      }}
+    >
+      <h1
+        style={{
+          textAlign: "center",
+          fontSize: "40px",
+          marginBottom: "10px",
+        }}
+      >
+        DirectHire Local
+      </h1>
 
-      <main className="main-content">
-        <section className="hero">
-          <h2 className="hero-title">Find Your Next Role</h2>
-          <p className="hero-subtitle">
-            Search top companies by skills, domains, or interests.
-          </p>
+      <p
+        style={{
+          textAlign: "center",
+          color: "#555",
+          marginBottom: "30px",
+          fontSize: "18px",
+        }}
+      >
+        Find jobs directly from official company career pages.
+      </p>
 
-          <div className="search-container">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search AI, Frontend, Finance, Cloud..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          alignItems: "center",
+          marginBottom: "40px",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Search AI, Finance, Cloud, Backend..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            padding: "12px",
+            width: "100%",
+            maxWidth: "400px",
+            borderRadius: "10px",
+            border: "1px solid #ccc",
+            fontSize: "16px",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: "20px",
+        }}
+      >
+        {filteredJobs.map((job, index) => (
+          <div
+            key={index}
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "15px",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h2
+              style={{
+                marginBottom: "10px",
+                fontSize: "24px",
+              }}
+            >
+              {job.company}
+            </h2>
+
+            <p>
+              <strong>Location:</strong> {job.location}
+            </p>
+
+            <p>
+              <strong>Categories:</strong>{" "}
+              {job.categories.join(", ")}
+            </p>
+
+            <a
+              href={job.base_url}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: "inline-block",
+                marginTop: "15px",
+                padding: "10px 15px",
+                backgroundColor: "#2563eb",
+                color: "white",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontWeight: "bold",
+              }}
+            >
+              View Careers
+            </a>
           </div>
-        </section>
-
-        <div className="jobs-grid">
-          {filteredJobs.map((job, index) => (
-            <div key={index} className="job-card">
-              <h3 className="company-name">{job.company}</h3>
-              
-              <div className="job-location">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                {job.location}
-              </div>
-
-              <div className="categories-list">
-                {job.categories.map((category, idx) => (
-                  <span key={idx} className="category-chip">
-                    {category}
-                  </span>
-                ))}
-              </div>
-
-              <a
-                href={`${job.base_url}${search}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: 'none' }}
-              >
-                <button className="visit-btn">
-                  Visit Careers Page
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
-                </button>
-              </a>
-            </div>
-          ))}
-        </div>
-      </main>
+        ))}
+      </div>
     </div>
   );
 }
