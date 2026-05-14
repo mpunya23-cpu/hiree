@@ -397,9 +397,10 @@ jobs = [
         "base_url": "https://www.zomato.com/careers?search="
     }
 ]
+
 @app.route("/")
 def home():
-    return "Hiree backend is running 🚀"
+    return "DirectHire Backend Running!"
 
 @app.route("/jobs")
 def get_jobs():
